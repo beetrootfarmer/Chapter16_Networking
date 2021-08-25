@@ -117,8 +117,29 @@ public class TcpServerHandler implements Runnable {
 	
 	/*
 	 * 귓속말 메소드
+	 *  
+	 *  문자열의 인덱스로 /to를 구별
+	 *  name: 보내는 클라이언트id
+	 *  msg: 보낼 메세지(/to IU 뭐하니?)
 	 */
 	private void whisper(String name, String msg) {
+		int start = msg.indexOf(" ") +1; // 시작 위치는 첫 공백의 +1
+		//to 이후를 시작 위치로 잡을 수 없나?혹은 @
+		int end = msg.indexOf(" ",start); //start위치부터 다음 공백이 나오는 위치
+		
+		if(end != -1) {
+//			toId= 받는사람
+			String toId	  = msg.substring(start, end); //substring 으로 첫점과 끝점 알려주기
+			String secret = msg.substring(end + 1); //substring 으로 시작지점만 알려주고 (시작지점부터)나머지지점 나타내기
+			
+			// sendMap으로부터 키<id>에 해당하는 PrintWriter객체를 얻어온다.
+			PrintWriter pw = TcpServerHandler.sendMap.get(toId);
+			// 메세지 전송
+			if(pw != null) {
+				pw.println(name + "님의 귓속말[^.^]: " + secret);
+				pw.flush();
+			}
+		}
 		
 	}
 	
